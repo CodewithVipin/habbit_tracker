@@ -75,7 +75,7 @@ class HabitDatabase {
 //kye: "PERCENTAGE_SUMMARYY_yyyymmdd"
 //value:  string of 1dp number between 0.0-1.0 inclusive
 
-    _myBox.put("PERCENTAGE_SUMMARYY_${todayDateFormatted()}", percent);
+    _myBox.put("PERCENTAGE_SUMMARY_${todayDateFormatted()}", percent);
   }
 
   void loadHeatMap() {
