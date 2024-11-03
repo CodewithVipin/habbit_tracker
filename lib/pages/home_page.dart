@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habbit_tracker/components/habit_tile.dart';
+import 'package:habbit_tracker/components/month_summary.dart';
 import 'package:habbit_tracker/components/my_fab.dart';
 import 'package:habbit_tracker/components/my_alert_box.dart';
 import 'package:habbit_tracker/data/habit_database.dart';
@@ -39,6 +40,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       db.todayHabitList[index][1] = value!;
     });
+    db.updateDataBase();
   }
 
   //create a new habit
@@ -66,6 +68,7 @@ class _HomePageState extends State<HomePage> {
     });
     _newHabitNameController.clear();
     Navigator.pop(context);
+    db.updateDataBase();
   }
 
   //Cancel new Habit
@@ -83,6 +86,7 @@ class _HomePageState extends State<HomePage> {
     });
     _newHabitNameController.clear();
     Navigator.pop(context);
+    db.updateDataBase();
   }
 
   // open habit settings to edit
@@ -103,30 +107,37 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       db.todayHabitList.removeAt(index);
     });
+    db.updateDataBase();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      floatingActionButton: MyFloatingActionButton(
-        onPressed: createNewHabit,
-      ),
-      body: db.todayHabitList.isNotEmpty
-          ? ListView.builder(
+        backgroundColor: Colors.grey[300],
+        floatingActionButton: MyFloatingActionButton(
+          onPressed: createNewHabit,
+        ),
+        body: ListView(
+          children: [
+            //monthly summary
+            MonthSummary(
+                datesets: db.heatMapDataset,
+                startDate: _myBox.get("START_DATE")),
+
+            //list of habit
+
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               itemCount: db.todayHabitList.length,
               itemBuilder: (context, index) => HabitTile(
                   settingTapped: (context) => openHabitSettings(index),
                   deleteTapped: (context) => deleteHabit(index),
                   habitName: db.todayHabitList[index][0],
                   habitCompleted: db.todayHabitList[index][1],
-                  onChanged: (value) => checkBoxTapped(value, index)))
-          : const Center(
-              child: Text(
-                "No Habit Found",
-                style: TextStyle(fontSize: 18),
-              ),
+                  onChanged: (value) => checkBoxTapped(value, index)),
             ),
-    );
+          ],
+        ));
   }
 }
