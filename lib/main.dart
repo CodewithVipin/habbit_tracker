@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: false,
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.grey,
       ),
       home: const HomePage(),
     );

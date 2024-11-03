@@ -41,16 +41,34 @@ class HabitTile extends StatelessWidget {
         ]),
         // startActionPane: ,
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-              color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
+              border: Border.all(color: Colors.grey.shade500),
+              color: Colors.grey[900],
+              borderRadius: BorderRadius.circular(8)),
           child: Row(
             children: [
               Checkbox(
+                fillColor: WidgetStateProperty.resolveWith<Color>(
+                  (Set<WidgetState> states) {
+                    // If the checkbox is checked, return the desired color
+                    if (states.contains(WidgetState.selected)) {
+                      return Colors
+                          .grey.shade800; // Change this to your desired color
+                    }
+                    // Return a default color for unchecked state
+                    return Colors.grey
+                        .shade500; // Change this to your desired unchecked color
+                  },
+                ),
                 value: habitCompleted,
                 onChanged: onChanged,
               ),
-              Expanded(child: Text(habitName)),
+              Expanded(
+                  child: Text(
+                habitName,
+                style: TextStyle(color: Colors.grey[500]),
+              )),
             ],
           ),
         ),
