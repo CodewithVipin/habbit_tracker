@@ -50,7 +50,7 @@ class HabitTile extends StatelessWidget {
                 value: habitCompleted,
                 onChanged: onChanged,
               ),
-              Text(habitName),
+              Expanded(child: Text(habitName)),
             ],
           ),
         ),

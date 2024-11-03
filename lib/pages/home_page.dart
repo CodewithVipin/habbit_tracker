@@ -37,6 +37,7 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) => MyAlertBox(
+        hintText: "Ener Habit Name",
         controller: _newHabitNameController,
         onCancel: cancelDialogueBox,
         onSave: onSaveNewHabit,
@@ -50,6 +51,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       todayHabitList.add([_newHabitNameController.text, false]);
     });
+    _newHabitNameController.clear();
     Navigator.pop(context);
   }
 
@@ -76,6 +78,7 @@ class _HomePageState extends State<HomePage> {
     showDialog(
         context: context,
         builder: (context) => MyAlertBox(
+            hintText: todayHabitList[index][0],
             controller: _newHabitNameController,
             onCancel: cancelDialogueBox,
             onSave: () => saveExistingHabit(index)));
@@ -96,14 +99,21 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: MyFloatingActionButton(
         onPressed: createNewHabit,
       ),
-      body: ListView.builder(
-          itemCount: todayHabitList.length,
-          itemBuilder: (context, index) => HabitTile(
-              settingTapped: (context) => openHabitSettings(index),
-              deleteTapped: (context) => deleteHabit(index),
-              habitName: todayHabitList[index][0],
-              habitCompleted: todayHabitList[index][1],
-              onChanged: (value) => checkBoxTapped(value, index))),
+      body: todayHabitList.isNotEmpty
+          ? ListView.builder(
+              itemCount: todayHabitList.length,
+              itemBuilder: (context, index) => HabitTile(
+                  settingTapped: (context) => openHabitSettings(index),
+                  deleteTapped: (context) => deleteHabit(index),
+                  habitName: todayHabitList[index][0],
+                  habitCompleted: todayHabitList[index][1],
+                  onChanged: (value) => checkBoxTapped(value, index)))
+          : const Center(
+              child: Text(
+                "No Habit Found",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
     );
   }
 }
