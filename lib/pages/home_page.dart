@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habbit_tracker/components/habit_tile.dart';
+import 'package:habbit_tracker/components/my_fab.dart';
+import 'package:habbit_tracker/components/new_habit_box.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +17,7 @@ class _HomePageState extends State<HomePage> {
     // habit name and boolean for completion of habit
     ["Morning Run", false],
     ["Morning Walk", false],
+    ["Code App", false],
   ];
 
 // check box tapped
@@ -25,10 +28,23 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  //create a new habit
+
+  void createNewHabit() {
+    //show a dialogue box
+    showDialog(
+      context: context,
+      builder: (context) => const EnterNewHabitBox(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      floatingActionButton: MyFloatingActionButton(
+        onPressed: createNewHabit,
+      ),
       body: ListView.builder(
           itemCount: todayHabitList.length,
           itemBuilder: (context, index) => HabitTile(
