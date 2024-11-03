@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habbit_tracker/components/habit_tile.dart';
 import 'package:habbit_tracker/components/my_fab.dart';
-import 'package:habbit_tracker/components/new_habit_box.dart';
+import 'package:habbit_tracker/components/my_alert_box.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,9 +36,9 @@ class _HomePageState extends State<HomePage> {
     //show a dialogue box
     showDialog(
       context: context,
-      builder: (context) => EnterNewHabitBox(
+      builder: (context) => MyAlertBox(
         controller: _newHabitNameController,
-        onCancel: onCancelNewHabit,
+        onCancel: cancelDialogueBox,
         onSave: onSaveNewHabit,
       ),
     );
@@ -55,9 +55,38 @@ class _HomePageState extends State<HomePage> {
 
   //Cancel new Habit
 
-  void onCancelNewHabit() {
+  void cancelDialogueBox() {
     _newHabitNameController.clear();
     Navigator.pop(context);
+  }
+
+//save existing habit
+
+  void saveExistingHabit(int index) {
+    setState(() {
+      todayHabitList[index][0] = _newHabitNameController.text;
+    });
+    _newHabitNameController.clear();
+    Navigator.pop(context);
+  }
+
+  // open habit settings to edit
+
+  void openHabitSettings(int index) {
+    showDialog(
+        context: context,
+        builder: (context) => MyAlertBox(
+            controller: _newHabitNameController,
+            onCancel: cancelDialogueBox,
+            onSave: () => saveExistingHabit(index)));
+  }
+
+  //delete habit
+
+  void deleteHabit(int index) {
+    setState(() {
+      todayHabitList.removeAt(index);
+    });
   }
 
   @override
@@ -70,6 +99,8 @@ class _HomePageState extends State<HomePage> {
       body: ListView.builder(
           itemCount: todayHabitList.length,
           itemBuilder: (context, index) => HabitTile(
+              settingTapped: (context) => openHabitSettings(index),
+              deleteTapped: (context) => deleteHabit(index),
               habitName: todayHabitList[index][0],
               habitCompleted: todayHabitList[index][1],
               onChanged: (value) => checkBoxTapped(value, index))),

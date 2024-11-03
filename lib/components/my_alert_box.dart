@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 
-class EnterNewHabitBox extends StatelessWidget {
+class MyAlertBox extends StatelessWidget {
   final controller;
   final VoidCallback onSave;
   final VoidCallback onCancel;
-  const EnterNewHabitBox(
+  const MyAlertBox(
       {super.key,
       required this.controller,
       required this.onCancel,
