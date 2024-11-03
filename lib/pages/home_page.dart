@@ -30,12 +30,34 @@ class _HomePageState extends State<HomePage> {
 
   //create a new habit
 
+  final _newHabitNameController = TextEditingController();
+
   void createNewHabit() {
     //show a dialogue box
     showDialog(
       context: context,
-      builder: (context) => const EnterNewHabitBox(),
+      builder: (context) => EnterNewHabitBox(
+        controller: _newHabitNameController,
+        onCancel: onCancelNewHabit,
+        onSave: onSaveNewHabit,
+      ),
     );
+  }
+
+  //save New Habbit
+
+  void onSaveNewHabit() {
+    setState(() {
+      todayHabitList.add([_newHabitNameController.text, false]);
+    });
+    Navigator.pop(context);
+  }
+
+  //Cancel new Habit
+
+  void onCancelNewHabit() {
+    _newHabitNameController.clear();
+    Navigator.pop(context);
   }
 
   @override
