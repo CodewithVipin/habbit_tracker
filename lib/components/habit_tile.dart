@@ -25,7 +25,6 @@ class HabitTile extends StatelessWidget {
           //setting Options
           SlidableAction(
             onPressed: settingTapped,
-            backgroundColor: Colors.grey.shade800,
             icon: Icons.settings,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -44,25 +43,22 @@ class HabitTile extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade500),
-              color: Colors.grey[900],
               borderRadius: BorderRadius.circular(8)),
           child: Row(
             children: [
               Checkbox(
-                fillColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    // If the checkbox is checked, return the desired color
-                    if (states.contains(WidgetState.selected)) {
-                      return Colors
-                          .grey.shade800; // Change this to your desired color
-                    }
-                    // Return a default color for unchecked state
-                    return Colors.grey
-                        .shade500; // Change this to your desired unchecked color
-                  },
-                ),
                 value: habitCompleted,
                 onChanged: onChanged,
+                activeColor: Colors.tealAccent, // Visible color when checked
+                checkColor:
+                    Colors.black, // Dark color for checkmark in dark theme
+                fillColor: WidgetStateProperty.resolveWith<Color>(
+                    (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Colors.tealAccent; // Color when checkbox is checked
+                  }
+                  return Colors.white70; // Default color when not checked
+                }),
               ),
               Expanded(
                   child: Text(

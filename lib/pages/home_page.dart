@@ -20,6 +20,15 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    String? lastUpdatedDate = _myBox.get("LAST_UPDATED_DATE");
+    String todayDate = DateTime.now().toString().split(' ')[0];
+
+    if (lastUpdatedDate != todayDate) {
+      db.resetTodayHabits();
+      _myBox.put("LAST_UPDATED_DATE", todayDate);
+    }
+
     if (_myBox.get("CURRENT_HABIT_LIST") == null) {
       db.createDefaultData();
     } else {
@@ -74,12 +83,14 @@ class _HomePageState extends State<HomePage> {
 
   void openHabitSettings(int index) {
     showDialog(
-        context: context,
-        builder: (context) => MyAlertBox(
-            hintText: db.todayHabitList[index][0],
-            controller: _newHabitNameController,
-            onCancel: cancelDialogueBox,
-            onSave: () => saveExistingHabit(index)));
+      context: context,
+      builder: (context) => MyAlertBox(
+        hintText: db.todayHabitList[index][0],
+        controller: _newHabitNameController,
+        onCancel: cancelDialogueBox,
+        onSave: () => saveExistingHabit(index),
+      ),
+    );
   }
 
   void deleteHabit(int index) {
@@ -92,36 +103,33 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black, // Set main background for dark mode
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.grey),
         elevation: 0.0,
-        title: Text(
+        title: const Text(
           "Build Habits, Build Success!",
-          style: TextStyle(color: Colors.grey[500]),
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.grey[900], // Darker AppBar
+        backgroundColor: Colors.grey[900], // Dark AppBar background
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[800],
+        backgroundColor: Colors.grey[850], // Dark drawer background
         child: const Center(
           child: Text(
             "Designed by Vipin Kumar Maurya",
-            style: TextStyle(color: Colors.white), // Light text for drawer
+            style: TextStyle(color: Colors.white70), // Light drawer text color
           ),
         ),
       ),
-      backgroundColor: Colors.grey[850], // Darker background
       floatingActionButton: MyFloatingActionButton(
         onPressed: createNewHabit,
       ),
       body: Column(
         children: [
-          // Monthly summary heat map
           MonthSummary(
             datesets: db.heatMapDataset,
             startDate: _myBox.get("START_DATE"),
           ),
-          // Expanded widget to allow the list to take the remaining space and scroll
           Expanded(
             child: ListView.builder(
               itemCount: db.todayHabitList.length,
