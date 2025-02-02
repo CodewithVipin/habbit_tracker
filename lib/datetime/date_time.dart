@@ -1,34 +1,25 @@
 //return todays date formatted as yyyymmdd
 String todayDateFormatted() {
-  //today
   var dateTimeObject = DateTime.now();
 
-  // year in format of yyyy
-
   String year = dateTimeObject.year.toString();
-  // month in format of mm
+  String month = dateTimeObject.month.toString().padLeft(2, '0');
+  String day = dateTimeObject.day.toString().padLeft(2, '0');
 
-  String month = dateTimeObject.month.toString();
-  if (month.length == 1) {
-    month = '0$month';
-  }
-  // day in format of dd
-  String day = dateTimeObject.day.toString();
-  if (day.length == 1) {
-    day = '0$day';
-  }
-  //final format
-  String yyyymmdd = year + month + day;
-  return yyyymmdd;
+  return '$year$month$day'; // Return in "yyyymmdd" format
 }
 
 //convert string yyyymmdd to DateTime Object
 DateTime createDateTimeObject(String yyyymmdd) {
-  int yyyy = int.parse(yyyymmdd.substring(0, 4));
-  int mm = int.parse(yyyymmdd.substring(4, 6));
-  int dd = int.parse(yyyymmdd.substring(6, 8));
-  DateTime dateTimeObject = DateTime(yyyy, mm, dd);
-  return dateTimeObject;
+  try {
+    int yyyy = int.parse(yyyymmdd.substring(0, 4));
+    int mm = int.parse(yyyymmdd.substring(4, 6));
+    int dd = int.parse(yyyymmdd.substring(6, 8));
+
+    return DateTime(yyyy, mm, dd); // Return as DateTime object
+  } catch (e) {
+    return DateTime.now(); // Fallback to current date in case of an error
+  }
 }
 
 //convert DateTime object to string yyymmdd

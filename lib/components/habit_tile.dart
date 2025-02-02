@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class HabitTile extends StatelessWidget {
+class HabitTile extends StatefulWidget {
   final String habitName;
   final bool habitCompleted;
   final Function(bool?)? onChanged;
@@ -17,6 +17,11 @@ class HabitTile extends StatelessWidget {
   });
 
   @override
+  State<HabitTile> createState() => _HabitTileState();
+}
+
+class _HabitTileState extends State<HabitTile> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -24,7 +29,7 @@ class HabitTile extends StatelessWidget {
         endActionPane: ActionPane(motion: const StretchMotion(), children: [
           //setting Options
           SlidableAction(
-            onPressed: settingTapped,
+            onPressed: widget.settingTapped,
             icon: Icons.settings,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -32,40 +37,50 @@ class HabitTile extends StatelessWidget {
           // delete Options
           //setting Options
           SlidableAction(
-            onPressed: deleteTapped,
+            onPressed: widget.deleteTapped,
             backgroundColor: Colors.red.shade400,
             icon: Icons.delete,
             borderRadius: BorderRadius.circular(12),
           ),
         ]),
         // startActionPane: ,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade500),
-              borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            children: [
-              Checkbox(
-                value: habitCompleted,
-                onChanged: onChanged,
-                activeColor: Colors.tealAccent, // Visible color when checked
-                checkColor:
-                    Colors.black, // Dark color for checkmark in dark theme
-                fillColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return Colors.tealAccent; // Color when checkbox is checked
-                  }
-                  return Colors.white70; // Default color when not checked
-                }),
-              ),
-              Expanded(
-                  child: Text(
-                habitName,
-                style: TextStyle(color: Colors.grey[500]),
-              )),
-            ],
+        child: GestureDetector(
+          onTap: () {
+            widget.onChanged!(!widget.habitCompleted);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: widget.habitCompleted
+                    ? Colors.green.withValues(alpha: 0.5)
+                    : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8)),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: widget.habitCompleted,
+                  onChanged: widget.onChanged,
+                  activeColor: Colors.tealAccent, // Visible color when checked
+                  checkColor:
+                      Colors.black, // Dark color for checkmark in dark theme
+                  fillColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return Colors
+                          .tealAccent; // Color when checkbox is checked
+                    }
+                    return Colors.white70; // Default color when not checked
+                  }),
+                ),
+                Expanded(
+                    child: Text(
+                  widget.habitName,
+                  style: TextStyle(
+                      color:
+                          widget.habitCompleted ? Colors.white : Colors.black),
+                )),
+              ],
+            ),
           ),
         ),
       ),

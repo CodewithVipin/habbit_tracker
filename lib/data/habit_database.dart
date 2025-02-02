@@ -1,5 +1,5 @@
-import 'package:habbit_tracker/datetime/date_time.dart';
 import 'package:hive/hive.dart';
+import 'package:habbit_tracker/datetime/date_time.dart';
 
 class HabitDatabase {
   // Define the Hive box inside the class
@@ -14,66 +14,68 @@ class HabitDatabase {
       ["Run", false],
       ["Read", false],
     ];
-    _myBox.put("START_DATE", todayDateFormatted());
+    _myBox.put("START_DATE", todayDateFormatted()); // Store today's date
   }
 
   // Load existing data
   void loadData() {
-    List<dynamic>? savedList = _myBox.get("CURRENT_HABIT_LIST");
-    if (savedList != null) {
-      todayHabitList = savedList.map((item) {
-        if (item is List &&
-            item.length == 2 &&
-            item[0] is String &&
-            item[1] is bool) {
-          return item;
-        } else {
-          return ["", false];
-        }
-      }).toList();
-    }
+    List<dynamic> savedList = _myBox.get("CURRENT_HABIT_LIST") ?? [];
+
+    todayHabitList = savedList.map((item) {
+      if (item is List &&
+          item.length == 2 &&
+          item[0] is String &&
+          item[1] is bool) {
+        return item;
+      } else {
+        return ["", false]; // Default value for invalid data
+      }
+    }).toList();
   }
 
   // Update the database with current data
   void updateDataBase() {
-    // Update today’s entry
-    _myBox.put(todayDateFormatted(), todayHabitList);
-
-    // Update universal habit list if it changed
-    _myBox.put("CURRENT_HABIT_LIST", todayHabitList);
-
-    // Calculate completion percentage for each day
-    calculatePercentage();
-
-    // Load heatmap data
-    loadHeatMap();
+    _myBox.put(todayDateFormatted(), todayHabitList); // Update today's habits
+    _myBox.put("CURRENT_HABIT_LIST", todayHabitList); // Update the habit list
+    calculatePercentage(); // Calculate and store the completion percentage
+    loadHeatMap(); // Update heatmap data
   }
 
   // Calculate completion percentage
   void calculatePercentage() {
     int countCompleted = 0;
-    for (int i = 0; i < todayHabitList.length; i++) {
-      if (todayHabitList[i][1] == true) {
+    for (var habit in todayHabitList) {
+      if (habit[1] == true) {
         countCompleted++;
       }
     }
+
     String percent = todayHabitList.isEmpty
-        ? '0.0'
-        : (countCompleted / todayHabitList.length).toStringAsFixed(1);
-    _myBox.put("PERCENTAGE_SUMMARY_${todayDateFormatted()}", percent);
+        ? "0.0"
+        : (countCompleted / todayHabitList.length)
+            .clamp(0, 1)
+            .toStringAsFixed(1);
+
+    _myBox.put("PERCENTAGE_SUMMARY_${todayDateFormatted()}",
+        percent); // Store the percentage
   }
 
-  // Load heat map data
+  // Load heatmap data
   void loadHeatMap() {
-    DateTime startDate = createDateTimeObject(_myBox.get("START_DATE"));
+    DateTime startDate =
+        createDateTimeObject(_myBox.get("START_DATE") ?? todayDateFormatted());
+
     int daysInBetween = DateTime.now().difference(startDate).inDays;
 
     for (int i = 0; i < daysInBetween + 1; i++) {
-      String yyyymmdd = convertDateTimeToString(
-        startDate.add(Duration(days: i)),
-      );
-      double strengthAsPercent =
-          double.parse(_myBox.get("PERCENTAGE_SUMMARY_$yyyymmdd") ?? "0.0");
+      String yyyymmdd =
+          convertDateTimeToString(startDate.add(Duration(days: i)));
+
+      // Safely parse percentage values and fallback to a default value if invalid
+      double strengthAsPercent = double.tryParse(
+              _myBox.get("PERCENTAGE_SUMMARY_$yyyymmdd")?.toString() ??
+                  "0.0") ??
+          0.0;
 
       int year = startDate.add(Duration(days: i)).year;
       int month = startDate.add(Duration(days: i)).month;
@@ -82,7 +84,8 @@ class HabitDatabase {
       final percentForEachDay = <DateTime, int>{
         DateTime(year, month, day): (10 * strengthAsPercent).toInt(),
       };
-      heatMapDataset.addEntries(percentForEachDay.entries);
+      heatMapDataset
+          .addEntries(percentForEachDay.entries); // Update heatmap dataset
     }
   }
 
@@ -93,5 +96,15 @@ class HabitDatabase {
           false; // Set each habit's completion status to false
     }
     updateDataBase(); // Save the reset list to Hive
+  }
+
+  // Safely create a DateTime object from a string, with error handling
+  DateTime createDateTimeObject(String dateStr) {
+    try {
+      return DateTime.parse(dateStr); // Parse the date if the format is correct
+    } catch (e) {
+      // Log errors for debugging
+      return DateTime.now(); // Fallback to current date if parsing fails
+    }
   }
 }

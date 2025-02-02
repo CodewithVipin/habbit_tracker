@@ -16,30 +16,53 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _myBox = Hive.box("Habit_Database");
   HabitDatabase db = HabitDatabase();
+  late String todayDate; // Store today's date as a class variable
 
   @override
   void initState() {
     super.initState();
 
-    String? lastUpdatedDate = _myBox.get("LAST_UPDATED_DATE");
-    String todayDate = DateTime.now().toString().split(' ')[0];
+    todayDate = DateTime.now().toString().split(' ')[0]; // Get today's date
 
+    // ✅ Debugging: Print stored START_DATE
+
+    // Ensure LAST_UPDATED_DATE is valid
+    String lastUpdatedDate = _myBox.get("LAST_UPDATED_DATE", defaultValue: "");
+    if (lastUpdatedDate.isEmpty ||
+        !RegExp(r"^\d{4}-\d{2}-\d{2}$").hasMatch(lastUpdatedDate)) {
+      lastUpdatedDate = todayDate; // Reset if invalid
+      _myBox.put("LAST_UPDATED_DATE", todayDate);
+    }
+
+    // Ensure START_DATE is valid
+    // Ensure START_DATE is valid
+    String? startDate = _myBox.get("START_DATE");
+    if (startDate == null ||
+        !RegExp(r"^\d{4}-\d{2}-\d{2}$").hasMatch(startDate)) {
+      _myBox.put("START_DATE", todayDate); // Set today's date if invalid
+    }
+
+    // ✅ Debugging: Print stored START_DATE after fix
+
+    // Reset habits for a new day
     if (lastUpdatedDate != todayDate) {
       db.resetTodayHabits();
       _myBox.put("LAST_UPDATED_DATE", todayDate);
     }
 
+    // Load or create habit data
     if (_myBox.get("CURRENT_HABIT_LIST") == null) {
       db.createDefaultData();
     } else {
       db.loadData();
     }
+
     db.updateDataBase();
   }
 
   void checkBoxTapped(bool? value, int index) {
     setState(() {
-      db.todayHabitList[index][1] = value!;
+      db.todayHabitList[index][1] = value ?? false;
     });
     db.updateDataBase();
   }
@@ -103,46 +126,53 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Set main background for dark mode
+      backgroundColor: Colors.black, // Dark mode background
       appBar: AppBar(
         elevation: 0.0,
         title: const Text(
           "Build Habits, Build Success!",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.grey[900], // Dark AppBar background
+        backgroundColor: Colors.grey[900], // Dark AppBar
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[850], // Dark drawer background
+        backgroundColor: Colors.grey[850], // Dark drawer
         child: const Center(
           child: Text(
             "Designed by Vipin Kumar Maurya",
-            style: TextStyle(color: Colors.white70), // Light drawer text color
+            style: TextStyle(color: Colors.white70), // Light drawer text
           ),
         ),
       ),
       floatingActionButton: MyFloatingActionButton(
         onPressed: createNewHabit,
       ),
-      body: Column(
-        children: [
-          MonthSummary(
-            datesets: db.heatMapDataset,
-            startDate: _myBox.get("START_DATE"),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: db.todayHabitList.length,
-              itemBuilder: (context, index) => HabitTile(
-                settingTapped: (context) => openHabitSettings(index),
-                deleteTapped: (context) => deleteHabit(index),
-                habitName: db.todayHabitList[index][0],
-                habitCompleted: db.todayHabitList[index][1],
-                onChanged: (value) => checkBoxTapped(value, index),
+      body: SingleChildScrollView(
+        // Ensure everything is scrollable
+        child: Column(
+          children: [
+            // MonthSummary takes up the required space before the ListView
+            MonthSummary(
+              datesets: db.heatMapDataset,
+              startDate: _myBox.get("START_DATE")?.toString() ??
+                  todayDate, // ✅ Fixed null issue
+            ),
+            // Wrap ListView inside Expanded to ensure it takes up remaining space
+            SizedBox(
+              height: 400, // You can adjust this height based on your design
+              child: ListView.builder(
+                itemCount: db.todayHabitList.length,
+                itemBuilder: (context, index) => HabitTile(
+                  settingTapped: (context) => openHabitSettings(index),
+                  deleteTapped: (context) => deleteHabit(index),
+                  habitName: db.todayHabitList[index][0] ?? "Unnamed Habit",
+                  habitCompleted: db.todayHabitList[index][1] ?? false,
+                  onChanged: (value) => checkBoxTapped(value, index),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
