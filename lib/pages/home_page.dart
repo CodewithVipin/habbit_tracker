@@ -128,6 +128,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black, // Dark mode background
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.grey),
         elevation: 0.0,
         title: const Text(
           "Build Habits, Build Success!",

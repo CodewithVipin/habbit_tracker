@@ -13,11 +13,12 @@ class MonthSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 25, bottom: 25),
       child: HeatMap(
+        showColorTip: false,
         startDate: createDateTimeObject(startDate),
         endDate: DateTime.now().add(const Duration(days: 0)),
         datasets: datesets,
         colorMode: ColorMode.color,
-        defaultColor: Colors.red[500],
+        defaultColor: Colors.grey[500],
         textColor: Colors.white,
         showText: true,
         size: 30,

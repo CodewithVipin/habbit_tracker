@@ -24,7 +24,7 @@ class _HabitTileState extends State<HabitTile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 25),
       child: Slidable(
         endActionPane: ActionPane(motion: const StretchMotion(), children: [
           //setting Options
@@ -49,7 +49,7 @@ class _HabitTileState extends State<HabitTile> {
             widget.onChanged!(!widget.habitCompleted);
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
                 color: widget.habitCompleted
                     ? Colors.green.withValues(alpha: 0.5)
