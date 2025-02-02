@@ -91,11 +91,23 @@ class HabitDatabase {
 
   // Reset today's habit completion status for a new day
   void resetTodayHabits() {
-    for (int i = 0; i < todayHabitList.length; i++) {
-      todayHabitList[i][1] =
-          false; // Set each habit's completion status to false
+    if (_myBox.containsKey("CURRENT_HABIT_LIST")) {
+      // Load the existing habits, but reset completion status
+      List<dynamic> savedList = _myBox.get("CURRENT_HABIT_LIST") ?? [];
+
+      todayHabitList = savedList.map((item) {
+        if (item is List && item.length == 2 && item[0] is String) {
+          return [item[0], false]; // Keep habit name, reset completion status
+        } else {
+          return ["", false]; // Default if invalid data
+        }
+      }).toList();
+
+      // Save the updated list with reset completion status
+      _myBox.put("CURRENT_HABIT_LIST", todayHabitList);
     }
-    updateDataBase(); // Save the reset list to Hive
+
+    updateDataBase(); // Save to Hive
   }
 
   // Safely create a DateTime object from a string, with error handling
